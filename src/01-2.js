@@ -9,11 +9,11 @@ for await (let line of fh.readLines()) {
 
   if (!line) {
     // check if elf can be inserted in top top_elves (array must remain ordered)
-    for (let i = 2; i >= 0; i--) {
+    for (let i = 0; i < 3; i++) {
       if (elf <= top_elves[i]) continue;
 
-      top_elves.splice(i + 1, 0, elf); // insert in-place (respect order) elf
-      top_elves.splice(0, 1); // remove the min elf
+      top_elves.splice(i, 0, elf); // insert in-place (respect order) elf
+      top_elves.pop(); // remove the min elf
       break;
     }
 
@@ -28,4 +28,5 @@ for await (let line of fh.readLines()) {
 
 const top_three = top_elves.reduce((acc, value) => acc + value, 0);
 
+// 215594
 console.log(top_three);

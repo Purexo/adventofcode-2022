@@ -17,4 +17,5 @@ for await (let line of fh.readLines()) {
   current+= value;
 }
 
+// 75501
 console.log(max);
