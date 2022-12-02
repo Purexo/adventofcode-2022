@@ -13,47 +13,43 @@ const ENCODED_DECODED = {
   Z: 'Scissors', // C Z | both players choosing Scissors
 };
 
-// 1 for Rock, 2 for Paper, and 3 for Scissors
-const SHAPE_SCORE = {
-  Rock: 1,
-  Paper: 2,
-  Scissors: 3,
-};
-
-// 0 if you lost, 3 if the round was a draw, and 6 if you won
-const OUTCOME_SCORE = {
-  Lost: 0,
-  Draw: 3,
-  Won: 6,
-}
-
-const IS_WIN = {
-  Rock(opponent) {
-    return opponent === 'Scissors';
-  },
-  Paper(opponent) {
-    return opponent === 'Rock';
-  },
-  Scissors(opponent) {
-    return opponent === 'Paper';
-  },
-}
-
+// STRATEGY_SCORE[opponent_shape][my_shape]: score
 // The score for a single round is the score for the shape you selected plus the score for the outcome of the round
-function getRoundScore(me, opponent) {
-  const shape_score = SHAPE_SCORE[me];
-
-  if (me === opponent) return shape_score + OUTCOME_SCORE.Draw;
-
-  return shape_score
-    + Number(IS_WIN[me](opponent)) * OUTCOME_SCORE.Won // Number(true) = 1, Number(false) = 0
+// my_outcome :
+//  Lost: 0
+//  Draw: 3
+//  Won: 6
+// shape :
+//  Rock: 1
+//  Paper: 2
+//  Scissors: 3
+const STRATEGY_SCORE = {
+  Rock: {
+    Rock: 1 + 3, // Draw
+    Paper: 2 + 6, // Won
+    Scissors: 0 + 3, // Lose
+  },
+  Paper: {
+    Rock: 1 + 0, // Lose
+    Paper: 2 + 3, // Draw
+    Scissors: 3 + 6, // Win
+  },
+  Scissors: {
+    Rock: 1 + 6, // Win
+    Paper: 2 + 0, // Lose
+    Scissors: 3 + 3, // Draw
+  },
 }
 
 let score = 0;
 for await (let line of fh.readLines()) {
   const [opponent_encoded, me_encoded] = line.split(' ');
 
-  score += getRoundScore(ENCODED_DECODED[me_encoded], ENCODED_DECODED[opponent_encoded]);
+  const opponent = ENCODED_DECODED[opponent_encoded];
+  const me = ENCODED_DECODED[me_encoded];
+
+  score += STRATEGY_SCORE[opponent][me];
 }
 
+// 8890
 console.log(score);
