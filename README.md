@@ -6,3 +6,4 @@ https://adventofcode.com/2022/
 
 - 01 ⭐⭐
 - 02 ⭐⭐
+- 03 ⭐
