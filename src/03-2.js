@@ -1,4 +1,6 @@
 import {open} from 'node:fs/promises';
+import {pipe, range, pmap, pfindTransform} from "./utils/itertools.js";
+import {pachunkify, pamap, pareduce} from "./utils/async-itertools.js";
 
 const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
 
@@ -16,81 +18,61 @@ const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
 const LOWER_SUB = -1 * (1 - 'a'.charCodeAt(0));
 const UPPER_SUB = -1 * (27 - 'A'.charCodeAt(0));
 
-let badges = 0;
-for await (let [r1, r2, r3] of asyncChunkify(fh.readLines())) {
-  const s1 = new Set();
-  const s2 = new Set();
-  const s3 = new Set();
-  
-  const iterations = range(0, Math.max(r1.length, r2.length, r3.length), 1)
-  const entries = map(iterations, i => [r1[i], r2[i], r3[i]]);
-  const badge = findTransform(entries, ([c1, c2, c3]) => {
-    s1.add(c1);
-    s2.add(c2);
-    s3.add(c3);
-  
-    if (s2.has(c1) && s3.has(c1)) return c1;
-    if (s1.has(c2) && s3.has(c2)) return c2;
-    if (s1.has(c3) && s2.has(c3)) return c3;
-  });
-  const badgeAsciiValue = badge.charCodeAt(0);
-  
-  const value = Number(badge >= 'a' && badge <= 'z') * (badgeAsciiValue - LOWER_SUB)
-    + Number(badge >= 'A' && badge <= 'Z') * (badgeAsciiValue - UPPER_SUB);
-  
-  badges += value;
-}
+const badges = await pipe(
+  fh.readLines(),
+  pachunkify(3),
+  pamap(getBadgeOfChunck),
+  pamap(getBadgeValue),
+  pareduce(sum, 0),
+);
 
 // 2703
 console.log(badges);
 
-async function* asyncChunkify(iterator, size = 3) {
-  let chunk = Array(size);
-  let i = 0;
+/**
+ * @param {string} r1
+ * @param {string} r2
+ * @param {string} r3
+ * @return {string} the char in common on three lines
+ */
+function getBadgeOfChunck([r1, r2, r3]) {
+  const s1 = new Set();
+  const s2 = new Set();
+  const s3 = new Set();
   
-  function resetChunk() {
-    chunk = Array(size);
-    i = 0;
-  }
-  
-  for await (const item of iterator) {
-    chunk[i++] = item;
+  function findBadge([c1, c2, c3]) {
+    s1.add(c1);
+    s2.add(c2);
+    s3.add(c3);
     
-    if (i === size) {
-      yield chunk;
-      resetChunk();
-    }
+    if (s2.has(c1) && s3.has(c1)) return c1;
+    if (s1.has(c2) && s3.has(c2)) return c2;
+    if (s1.has(c3) && s2.has(c3)) return c3;
   }
   
-  if (i > 0) {
-    yield chunk;
-  }
-}
-
-function* range(start, end, step) {
-  for (let i = start; i < end; i += step) {
-    yield i;
-  }
-}
-
-function* map(iterator, mapFn) {
-  for (const item of iterator) {
-    yield mapFn(item);
-  }
+  return pipe(
+    range(0, Math.max(r1.length, r2.length, r3.length), 1),
+    pmap(i => [r1[i], r2[i], r3[i]]),
+    pfindTransform(findBadge),
+  );
 }
 
 /**
- * Consume the iterator
- * for each item use transform callback
- * if his return is truthy return the value returned by transform callback
- * @param iterator
- * @param transform value = transform(item)
- * @returns {*} value if truthy
+ * @param {string} badge
+ * @return {number}
  */
-function findTransform(iterator, transform) {
-  for (const item of iterator) {
-    const value = transform(item);
+function getBadgeValue(badge) {
+  const badgeAsciiValue = badge.charCodeAt(0);
+  
+  return Number(badge >= 'a' && badge <= 'z') * (badgeAsciiValue - LOWER_SUB)
+    + Number(badge >= 'A' && badge <= 'Z') * (badgeAsciiValue - UPPER_SUB);
+}
 
-    if (value) return value;
-  }
+/**
+ * @param {number} a
+ * @param {number} b
+ * @return {number}
+ */
+function sum(a, b) {
+  return a + b;
 }

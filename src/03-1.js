@@ -1,4 +1,6 @@
 import {open} from 'node:fs/promises';
+import {pfindTransform, pipe, piterateInTwoWindow} from "./utils/itertools.js";
+import {pamap, pareduce} from "./utils/async-itertools.js";
 
 const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
 
@@ -15,49 +17,47 @@ const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
 const LOWER_SUB = -1 * (1 - 'a'.charCodeAt(0));
 const UPPER_SUB = -1 * (27 - 'A'.charCodeAt(0));
 
-let priorities = 0;
-for await (let line of fh.readLines()) {
+const priorities = await pipe(
+  fh.readLines(),
+  pamap(getCharInTwoPartOfTheLine),
+  pamap(getBadgeValue),
+  pareduce(sum, 0)
+);
+
+// 7795
+console.log(priorities);
+
+function getCharInTwoPartOfTheLine(line) {
   const s1 = new Set();
   const s2 = new Set();
   
-  const char = findTransform(iterateInTwoWindow(line), ([c1, c2]) => {
+  function findChar([c1, c2]) {
     s1.add(c1);
     s2.add(c2);
-  
+    
     if (s1.has(c2)) return c2;
     if (s2.has(c1)) return c1;
-  });
-  const charAsciiValue = char.charCodeAt(0);
-  
-  const value = Number(char >= 'a' && char <= 'z') * (charAsciiValue - LOWER_SUB)
-    + Number(char >= 'A' && char <= 'Z') * (charAsciiValue - UPPER_SUB);
-
-  priorities += value;
-}
-
-// 8890
-console.log(priorities);
-
-function* iterateInTwoWindow(str) {
-  let i2 = str.length / 2;
-  
-  for (const c of str) {
-    yield [c, str[i2++]];
   }
+  
+  return pipe(line, piterateInTwoWindow, pfindTransform(findChar));
 }
 
 /**
- * Consume the iterator
- * for each item use transform callback
- * if his return is truthy return the value returned by transform callback
- * @param iterator
- * @param transform value = transform(item)
- * @returns {*} value if truthy
+ * @param {string} badge
+ * @return {number}
  */
-function findTransform(iterator, transform) {
-  for (const item of iterator) {
-    const value = transform(item);
+function getBadgeValue(badge) {
+  const badgeAsciiValue = badge.charCodeAt(0);
+  
+  return Number(badge >= 'a' && badge <= 'z') * (badgeAsciiValue - LOWER_SUB)
+    + Number(badge >= 'A' && badge <= 'Z') * (badgeAsciiValue - UPPER_SUB);
+}
 
-    if (value) return value;
-  }
+/**
+ * @param {number} a
+ * @param {number} b
+ * @return {number}
+ */
+function sum(a, b) {
+  return a + b;
 }
