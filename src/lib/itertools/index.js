@@ -176,7 +176,21 @@ export function reduce(iterable, reduceFn, init= 0) {
   return init;
 }
 
-export const toArray = Array.from;
+/**
+ *
+ * @template T
+ * @param {Iterable<T>} iterable
+ * @return {T[]}
+ */
+export function toArray(iterable) {
+  const result = [];
+  
+  for (const item of iterable) {
+    result.push(result);
+  }
+  
+  return result;
+}
 
 /**
  *
