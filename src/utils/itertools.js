@@ -88,3 +88,7 @@ export const piterateInTwoWindow = str => iterateInTwoWindow(str);
 export function pipe(value, ...functions) {
   return functions.reduce((previousValue, fn) => fn(previousValue), value);
 }
+
+export function sum(a, b) {
+  return a + b;
+}
