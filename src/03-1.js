@@ -1,6 +1,8 @@
 import {open} from 'node:fs/promises';
-import {pfindTransform, pipe, piterateInTwoWindow} from "./utils/itertools.js";
-import {pamap, pareduce} from "./utils/async-itertools.js";
+import {pipe, sum} from "./lib/functools.js";
+import {pamap, pareduce} from "./lib/pipable-itertools/async.js";
+import {piterateInTwoWindow} from "./utils/itertools.js";
+import {pfindMap} from "./lib/pipable-itertools/index.js";
 
 const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
 
@@ -21,7 +23,7 @@ const priorities = await pipe(
   fh.readLines(),
   pamap(getCharInTwoPartOfTheLine),
   pamap(getBadgeValue),
-  pareduce(sum, 0)
+  pareduce(sum, 0),
 );
 
 // 7795
@@ -39,7 +41,7 @@ function getCharInTwoPartOfTheLine(line) {
     if (s2.has(c1)) return c1;
   }
   
-  return pipe(line, piterateInTwoWindow, pfindTransform(findChar));
+  return pipe(line, piterateInTwoWindow, pfindMap(findChar));
 }
 
 /**
@@ -51,13 +53,4 @@ function getBadgeValue(badge) {
   
   return Number(badge >= 'a' && badge <= 'z') * (badgeAsciiValue - LOWER_SUB)
     + Number(badge >= 'A' && badge <= 'Z') * (badgeAsciiValue - UPPER_SUB);
-}
-
-/**
- * @param {number} a
- * @param {number} b
- * @return {number}
- */
-function sum(a, b) {
-  return a + b;
 }

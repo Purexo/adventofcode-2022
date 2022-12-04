@@ -1,6 +1,8 @@
 import {open} from 'node:fs/promises';
-import {pipe, range, pmap, pfindTransform} from "./utils/itertools.js";
-import {pachunkify, pamap, pareduce} from "./utils/async-itertools.js";
+import {pachunkify, pamap, pareduce} from "./lib/pipable-itertools/async.js";
+import {pipe, sum} from "./lib/functools.js";
+import {range} from "./lib/itertools/index.js";
+import {pfindMap, pmap} from "./lib/pipable-itertools/index.js";
 
 const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
 
@@ -53,7 +55,7 @@ function getBadgeOfChunck([r1, r2, r3]) {
   return pipe(
     range(0, Math.max(r1.length, r2.length, r3.length), 1),
     pmap(i => [r1[i], r2[i], r3[i]]),
-    pfindTransform(findBadge),
+    pfindMap(findBadge),
   );
 }
 
@@ -66,13 +68,4 @@ function getBadgeValue(badge) {
   
   return Number(badge >= 'a' && badge <= 'z') * (badgeAsciiValue - LOWER_SUB)
     + Number(badge >= 'A' && badge <= 'Z') * (badgeAsciiValue - UPPER_SUB);
-}
-
-/**
- * @param {number} a
- * @param {number} b
- * @return {number}
- */
-function sum(a, b) {
-  return a + b;
 }

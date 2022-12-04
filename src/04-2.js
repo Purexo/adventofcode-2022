@@ -1,6 +1,6 @@
 import {open} from 'node:fs/promises';
-import {pipe, sum} from "./utils/itertools.js";
-import {pamap, pareduce} from "./utils/async-itertools.js";
+import {pipe, sum} from "./lib/functools.js";
+import {pamap, pareduce} from "./lib/pipable-itertools/async.js";
 
 const fh = await open(new URL('../fixtures/04.txt', import.meta.url));
 

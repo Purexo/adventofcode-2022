@@ -1,29 +1,15 @@
 // these methods produce new iterators, so we need to override them to extend their iterator result
-import {drop, filter, flat, flatMap, forEach, indexed, map, reduce, take, toArray} from "./itertools.js";
+import {polyfill_sync} from "./polyfill-sync.js";
+import {polyfill_async} from "./polyfill-async.js";
 
 const method_to_override = new Set(['map', 'filter', 'take', 'drop', 'indexed', 'flatMap']);
-
-const polyfill = {
-  map(mapFn) {return map(this, mapFn)},
-  filter(filterFn) {return filter(this, filterFn)},
-  take(limit) {return take(this, limit)},
-  drop(limit) {return drop(this, limit)},
-  indexed(start) {return indexed(this, start)},
-  flat(max_depth) {return flat(this, max_depth)},
-  flatMap(mapFn, max_depth) {return flatMap(this, mapFn, max_depth)},
-  reduce(reduceFn, acc) {return reduce(this, reduceFn, acc)},
-  toArray() {return toArray(this)},
-  forEach(forEachFn) {return forEach(this, forEachFn)},
-  [Symbol.iterator]() {
-    return this;
-  },
-}
 
 /**
  * @template T
  * @param {Iterator<T>} iterator
  * @param {object} methods - an object of methods
  * @param {Iterable<string>} chainableMethods - list of chainable method
+ * @param {object} polyfill - polyfill of https://github.com/tc39/proposal-iterator-helpers
  * @return {IterableIterator<T>} return the iterator enrich with helpers from methods
  * @example
  * ```js
@@ -82,7 +68,7 @@ const polyfill = {
  *  })
  * ```
  */
-export function ExtendIterator(iterator, methods, chainableMethods) {
+function __ExtendIterator(iterator, methods, chainableMethods, polyfill) {
   // get prototype of iterator
   const origin_prototype = Object.getPrototypeOf(iterator);
   
@@ -93,7 +79,7 @@ export function ExtendIterator(iterator, methods, chainableMethods) {
   for (const method_name of method_to_override) {
     new_prototype[method_name] = function () {
       const inner_it = origin_prototype[method_name].apply(iterator, arguments);
-      return ExtendIterator(inner_it, methods, chainableMethods);
+      return __ExtendIterator(inner_it, methods, chainableMethods, polyfill);
     };
   }
   
@@ -103,7 +89,7 @@ export function ExtendIterator(iterator, methods, chainableMethods) {
     new_prototype[method_name] = chainableMethods.has(method_name)
       ? function () {
         const inner_it = methods[method_name].apply(iterator, arguments);
-        return ExtendIterator(inner_it, methods, chainableMethods);
+        return __ExtendIterator(inner_it, methods, chainableMethods);
       }
       : methods[method_name];
   }
@@ -117,3 +103,10 @@ export function ExtendIterator(iterator, methods, chainableMethods) {
   return iterator;
 }
 
+export function ExtendIterator(iterator, methods, chainableMethods) {
+  return __ExtendIterator(iterator, methods, chainableMethods, polyfill_sync);
+}
+
+export function ExtendAsyncIterator(iterator, methods, chainableMethods) {
+  return __ExtendIterator(iterator, methods, chainableMethods, polyfill_async)
+}
