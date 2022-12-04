@@ -74,6 +74,17 @@ function __ExtendIterator(iterator, methods = {}, chainableMethods = new Set(), 
   
   // prepare new prototype
   const new_prototype = {...polyfill};
+  if (polyfill === polyfill_sync) {
+    async function* toAsync() {
+      for (const item of this) {
+        yield Promise.resolve(item);
+      }
+    }
+    new_prototype['toAsync'] = async function () {
+      const inner_it = await toAsync.apply(iterator, arguments);
+      return __ExtendIterator(inner_it, methods, chainableMethods, polyfill_async);
+    }
+  }
   
   // override methods so their iterator result is also extended
   for (const method_name of method_to_override) {
