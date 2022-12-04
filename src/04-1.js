@@ -1,18 +1,16 @@
 import {open} from 'node:fs/promises';
-import {pipe, sum} from "./lib/functools.js";
-import {pamap, pareduce} from "./lib/pipable-itertools/async.js";
+import {sum} from "./lib/functools.js";
+import {ExtendAsyncIterator} from "./lib/IteratorHelpers/index.js";
 
 const fh = await open(new URL('../fixtures/04.txt', import.meta.url));
 
 const PAIR_SEPARATOR = '-';
 const CELL_SEPARATOR = ',';
 
-const countPairsIncludingOthers = await pipe(
-  fh.readLines(),
-  pamap(getPairsOfLine),
-  pamap(isOnePairFullyContainsTheOther),
-  pareduce(sum, 0),
-);
+const countPairsIncludingOthers = await ExtendAsyncIterator(fh.readLines())
+  .map(getPairsOfLine)
+  .map(isOnePairFullyContainsTheOther)
+  .reduce(sum, 0);
 
 // 536
 console.log(countPairsIncludingOthers);

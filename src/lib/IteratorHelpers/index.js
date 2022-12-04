@@ -68,7 +68,7 @@ const method_to_override = new Set(['map', 'filter', 'take', 'drop', 'indexed', 
  *  })
  * ```
  */
-function __ExtendIterator(iterator, methods, chainableMethods, polyfill) {
+function __ExtendIterator(iterator, methods = {}, chainableMethods = [], polyfill) {
   // get prototype of iterator
   const origin_prototype = Object.getPrototypeOf(iterator);
   
@@ -78,7 +78,8 @@ function __ExtendIterator(iterator, methods, chainableMethods, polyfill) {
   // override methods so their iterator result is also extended
   for (const method_name of method_to_override) {
     new_prototype[method_name] = function () {
-      const inner_it = origin_prototype[method_name].apply(iterator, arguments);
+      const method = origin_prototype[method_name] ?? polyfill[method_name];
+      const inner_it = method.apply(iterator, arguments);
       return __ExtendIterator(inner_it, methods, chainableMethods, polyfill);
     };
   }
