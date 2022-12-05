@@ -101,7 +101,7 @@ function __ExtendIterator(iterator, methods = {}, chainableMethods = new Set(), 
     new_prototype[method_name] = chainableMethods.has(method_name)
       ? function () {
         const inner_it = methods[method_name].apply(iterator, arguments);
-        return __ExtendIterator(inner_it, methods, chainableMethods);
+        return __ExtendIterator(inner_it, methods, chainableMethods, polyfill);
       }
       : methods[method_name];
   }
