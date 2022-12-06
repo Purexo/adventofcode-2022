@@ -1,10 +1,10 @@
 import {open} from 'node:fs/promises';
-import {pipe, sum} from "./lib/functools.js";
-import {pamap, pareduce} from "./lib/pipable-itertools/async.js";
-import {piterateInTwoWindow} from "./utils/itertools.js";
-import {pfindMap} from "./lib/pipable-itertools/index.js";
+import {pipe, sum} from "../lib/functools.js";
+import {pamap, pareduce} from "../lib/pipable-itertools/async.js";
+import {piterateInTwoWindow} from "../utils/itertools.js";
+import {pfindMap} from "../lib/pipable-itertools/index.js";
 
-const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
+const fh = await open(new URL('./input.txt', import.meta.url));
 
 // 1. find the char which is in both part of the row
 // 2. associate char to value following these rules

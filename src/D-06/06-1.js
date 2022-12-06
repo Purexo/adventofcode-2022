@@ -1,5 +1,5 @@
 import {createReadStream} from "node:fs";
-const chars = createReadStream(new URL('../fixtures/06.txt', import.meta.url), {highWaterMark: 1, encoding: 'utf8'});
+const chars = createReadStream(new URL('./input.txt', import.meta.url), {highWaterMark: 1, encoding: 'utf8'});
 
 const last4Chars = [];
 let i = 0

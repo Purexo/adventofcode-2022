@@ -1,5 +1,5 @@
 import {createReadStream} from "node:fs";
-const chars = createReadStream(new URL('../fixtures/06.txt', import.meta.url), {highWaterMark: 1, encoding: 'utf8'});
+const chars = createReadStream(new URL('./input.txt', import.meta.url), {highWaterMark: 1, encoding: 'utf8'});
 // const chars = 'mjqjpqmgbljsphdztnvjfqwrcgsmlb' // 19
 
 const last14Chars = [];
@@ -14,5 +14,5 @@ for await (const char of chars) {
   if (last14Chars.length === 14) break;
 }
 
-// 1909
+// 3380
 console.log(i);

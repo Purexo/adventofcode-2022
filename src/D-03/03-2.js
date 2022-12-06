@@ -1,10 +1,10 @@
 import {open} from 'node:fs/promises';
-import {pachunkify, pamap, pareduce} from "./lib/pipable-itertools/async.js";
-import {pipe, sum} from "./lib/functools.js";
-import {range} from "./lib/itertools/index.js";
-import {pfindMap, pmap} from "./lib/pipable-itertools/index.js";
+import {pachunkify, pamap, pareduce} from "../lib/pipable-itertools/async.js";
+import {pipe, sum} from "../lib/functools.js";
+import {range} from "../lib/itertools/index.js";
+import {pfindMap, pmap} from "../lib/pipable-itertools/index.js";
 
-const fh = await open(new URL('../fixtures/03.txt', import.meta.url));
+const fh = await open(new URL('./input.txt', import.meta.url));
 
 // 1. read rows by chunk of three
 // 2. find the char included in 3 rows

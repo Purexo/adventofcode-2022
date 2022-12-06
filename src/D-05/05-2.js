@@ -1,12 +1,12 @@
 import {open} from "node:fs/promises";
-import {ExtendIterator} from "./lib/IteratorHelpers/index.js";
-import {range} from "./lib/itertools/index.js";
-import {sum} from "./lib/functools.js";
+import {ExtendIterator} from "../lib/IteratorHelpers/index.js";
+import {range} from "../lib/itertools/index.js";
+import {sum} from "../lib/functools.js";
 
 // move 10 from 7 to 2
 const REGEX_EXTRACT_POSITIONS = /move (\d+) from (\d)+ to (\d+)/;
 
-const fh = await open(new URL('../fixtures/05.txt', import.meta.url));
+const fh = await open(new URL('./input.txt', import.meta.url));
 
 /**
  * @type {Map<number, string[]>}
@@ -49,14 +49,13 @@ function parseMovements(line) {
   
   const move = from.splice(-amount);
   to.push.apply(to, move);
-  console.log(move);
 }
 
 const top_items = ExtendIterator(stacks.values())
   .map(stack => stack.pop())
   .reduce(sum, '');
 
-// NOT TCGLQSLPW
+// TCGLQSLPW
 console.log(top_items);
 
 

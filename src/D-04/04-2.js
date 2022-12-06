@@ -1,19 +1,19 @@
 import {open} from 'node:fs/promises';
-import {sum} from "./lib/functools.js";
-import {ExtendAsyncIterator} from "./lib/IteratorHelpers/index.js";
+import {sum} from "../lib/functools.js";
+import {ExtendAsyncIterator} from "../lib/IteratorHelpers/index.js";
 
-const fh = await open(new URL('../fixtures/04.txt', import.meta.url));
+const fh = await open(new URL('./input.txt', import.meta.url));
 
 const PAIR_SEPARATOR = '-';
 const CELL_SEPARATOR = ',';
 
-const countPairsIncludingOthers = await ExtendAsyncIterator(fh.readLines())
+const countPairsOverlap = await ExtendAsyncIterator(fh.readLines())
   .map(getPairsOfLine)
-  .map(isOnePairFullyContainsTheOther)
+  .map(isPairsOverlapping)
   .reduce(sum, 0);
 
-// 536
-console.log(countPairsIncludingOthers);
+// 845
+console.log(countPairsOverlap);
 
 /**
  * parse line char by char, on find a separator put the aggregated value to the right place in pairs
@@ -75,7 +75,6 @@ function getPairsOfLine(line) {
   return pairs;
 }
 
-function isOnePairFullyContainsTheOther([a, b, c, d]) {
-  return c >= a && d <= b // [a..b] ⊃ [c..d]
-    || a >= c && b <= d // [c..d] ⊃ [a..b]
+function isPairsOverlapping([start_a, end_a, start_b, end_b]) {
+  return start_a <= end_b && end_a >= start_b; // [start_a..end_a] ⋂ [start_b..end_b]
 }

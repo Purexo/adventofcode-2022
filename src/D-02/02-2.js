@@ -1,6 +1,6 @@
 import {open} from 'node:fs/promises';
 
-const fh = await open(new URL('../fixtures/02.txt', import.meta.url));
+const fh = await open(new URL('./input.txt', import.meta.url));
 
 // The first column is what your opponent is going to play: A for Rock, B for Paper, and C for Scissors
 const ENCODED_DECODED_OPPONENT = {

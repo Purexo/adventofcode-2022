@@ -1,6 +1,6 @@
 import {open} from 'node:fs/promises';
 
-const fh = await open(new URL('../fixtures/01.txt', import.meta.url))
+const fh = await open(new URL('./input.txt', import.meta.url))
 
 let max = -Infinity;
 let current = 0;
