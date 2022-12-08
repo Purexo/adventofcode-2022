@@ -14,6 +14,7 @@ for (const [y, trees] of data_y_x.entries()) {
  * Scan approach
  * on each row I check from left side and count visible trees, same from right
  * on each column I check from top side and count visible trees, same from bottom
+ * store the coordinate of trees viewable in a set to avoid counting multiple time same trees
  */
 
 /** @type {Set<string>} */
@@ -72,10 +73,12 @@ for (let x = 0; x < data_x_y.length; x++) {
 console.log(treeSeen.size);
 
 /*
- * Walker approch
+ * Walker approach
  * On each tree, check if we can see the outside of the forest
  *
  * Not functional, I have bug counting somewhere
+ * My slice was incorrect => part 2
+ * bug fixed, work fine
  */
 
 let treeVisibleFromOutside = 0;
@@ -97,8 +100,8 @@ for (const [y, trees] of data_y_x.entries()) {
     }
 
     // iterate on rest of the trees to check
-    const rightTrees = trees.slice(-x);
-    const bottomTrees = data_x_y[x].slice(-x);
+    const rightTrees = trees.slice(x+1);
+    const bottomTrees = data_x_y[x].slice(y+1);
 
     const isVisibleFromRight = rightTrees.every(rt => tree > rt);
     if (isVisibleFromRight) {
