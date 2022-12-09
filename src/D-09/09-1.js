@@ -78,5 +78,6 @@ for await (const line of fh.readLines()) {
   MOVE_STRATEGY[direction](distance);
 }
 
-// train expected = 13
+// train expected 13
+// answer is 5960
 console.log(TAIL_VISITED.size);
