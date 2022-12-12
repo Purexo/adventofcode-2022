@@ -186,7 +186,7 @@ export function toArray(iterable) {
   const result = [];
   
   for (const item of iterable) {
-    result.push(result);
+    result.push(item);
   }
   
   return result;

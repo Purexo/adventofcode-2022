@@ -1,4 +1,7 @@
 import fs from 'node:fs';
+import {pipe} from "../lib/functools.js";
+import {pfilter, pmap} from "../lib/pipable-itertools/index.js";
+import {toArray} from "../lib/itertools/index.js";
 
 const raw = fs
   .readFileSync(new URL('./input.txt', import.meta.url), {encoding: 'utf8'})
@@ -43,8 +46,13 @@ for (const [index, elevation] of matrix.entries()) {
 }
 
 const highest_step_min = new Map();
-const NOROLLBACK = new Set([start_pos]);
-let possibilities = [start_pos];
+let possibilities = pipe(
+  matrix.entries(),
+  pfilter(([index, elevation]) => elevation === 'a'),
+  pmap(([index]) => index),
+  toArray
+);
+const NOROLLBACK = new Set(possibilities);
 let steps = 0;
 let stop = false;
 while (!stop) {
@@ -116,6 +124,6 @@ for (const elevation of highest_step_min.keys()) {
   if (elevation > highest_elevation_reached) highest_elevation_reached = elevation;
 }
 
-// train expected 31
-// guessed 504
+// train expected 29
+// guessed 500
 console.log(highest_step_min.get(highest_elevation_reached));

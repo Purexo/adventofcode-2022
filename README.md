@@ -15,4 +15,4 @@ https://adventofcode.com/2022/
 - [09](src/D-09) [⭐](src/D-09/09-1.js)[⭐](src/D-09/09-2.js)
 - [10](src/D-10) [⭐](src/D-10/10-1.js)[⭐](src/D-10/10-2.js)
 - [11](src/D-11) [⭐](src/D-11/11-1.js)[⭐](src/D-11/11-2.js)
-- [11](src/D-12) [⭐](src/D-12/12-1.js)
+- [11](src/D-12) [⭐](src/D-12/12-1.js)[⭐](src/D-12/12-2.js)
