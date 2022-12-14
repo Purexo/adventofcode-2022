@@ -17,3 +17,4 @@ https://adventofcode.com/2022/
 - [11](src/D-11) [⭐](src/D-11/11-1.js)[⭐](src/D-11/11-2.js)
 - [12](src/D-12) [⭐](src/D-12/12-1.js)[⭐](src/D-12/12-2.js)
 - [13](src/D-13) [⭐](src/D-13/13-1.js)[⭐](src/D-13/13-2.js)
+- [14](src/D-14) [⭐](src/D-14/14-1.js)[⭐](src/D-14/14-2.js)
