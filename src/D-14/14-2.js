@@ -71,8 +71,8 @@ class InfiniteCavern extends Map {
   toString() {
     let str = '';
 
-    for (let y = 0; y <= this.max_y + 1; y++) {
-      for (let x = 0; x <= this.max_x; x++) {
+    for (let y = this.min_y; y <= this.max_y + 1; y++) {
+      for (let x = this.min_x - 1; x <= this.max_x + 1; x++) {
         str += this.get(x, y);
       }
       str += '\n';
